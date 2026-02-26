@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Error 404{% endblock %}
+
+{% block navbar_imagen %}
+<img width="50" src="{% static 'img/logo.png' %}" alt="Alternativa"/>
+{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-10">
+        <h1>Error 404</h1>
+        <p>La página que estas buscando no existe o entraste a un enlace roto</p>
+        <a class="btn btn-success" href="{% url 'index' %}">Da click aquí para volver</a>
+    </div>
+</div>
+{% endblock %}

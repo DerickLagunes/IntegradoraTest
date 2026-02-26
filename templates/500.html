@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Error 500{% endblock %}
+
+{% block navbar_imagen %}
+<img width="50" src="{% static 'img/logo.png' %}" alt="Alternativa"/>
+{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-10">
+        <h1>Error 500</h1>
+        <p>Disculpa, algo salio mal en nuestro servidor.</p>
+        <p>El error ya ha sido registrado y pronto será atendido por nuestro equipo de desarrollo.</p>
+        <a class="btn btn-success" href="{% url 'index' %}">Da click aquí para volver</a>
+    </div>
+</div>
+{% endblock %}
