@@ -16,7 +16,6 @@ export const create = (data) => {
     }
     return axios.post(`${BASE_URL}/`, formData);
 };
-
 // 3. ACTUALIZAR (PUT)
 export const update = (id, data) => {
     const formData = new FormData();
