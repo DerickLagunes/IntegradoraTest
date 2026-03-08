@@ -1,5 +1,4 @@
-//En este caso es para Mascotas
-
+// En este caso es para Mascotas
 import axios from 'axios';
 const BASE_URL = 'http://localhost:8000/api/mascotas'; 
 
@@ -9,20 +8,15 @@ export const read = () => {
 };
 
 // 2. CREAR (POST)
+// Recibe el FormData directamente desde el componente y lo envía
 export const create = (data) => {
-    const formData = new FormData();
-    for (const key in data) {
-        formData.append(key, data[key]);
-    }
-    return axios.post(`${BASE_URL}/`, formData);
+    return axios.post(`${BASE_URL}/`, data);
 };
+
 // 3. ACTUALIZAR (PUT)
+// Recibe el FormData directamente desde el componente y lo envía
 export const update = (id, data) => {
-    const formData = new FormData();
-    for (const key in data) {
-        formData.append(key, data[key]);
-    }
-    return axios.put(`${BASE_URL}/${id}/`, formData);
+    return axios.put(`${BASE_URL}/${id}/`, data);
 };
 
 // 4. ELIMINAR (DELETE)

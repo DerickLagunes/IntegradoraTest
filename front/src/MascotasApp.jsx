@@ -6,11 +6,17 @@ import toast, { Toaster } from "react-hot-toast";
 
 export default function MascotasApp() {
   const [mascotas, setMascotas] = useState([]);
-  const [formData, setFormData] = useState({
+  
+  // Estado inicial centralizado para limpiar fácilmente el formulario
+  const estadoInicial = {
     nombre: "",
     especie: "",
     edad: "",
-  });
+    foto: null,
+    foto_para_binario: null,
+  };
+
+  const [formData, setFormData] = useState(estadoInicial);
   const [editandoId, setEditandoId] = useState(null);
   const [filtro, setFiltro] = useState("");
   const [cargandoTabla, setCargandoTabla] = useState(false);
@@ -35,36 +41,62 @@ export default function MascotasApp() {
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    // Si el input es un archivo, guardamos el objeto File en lugar del string de la ruta
+    if (e.target.type === "file") {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.files[0],
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); //NO SE RECARGE LA PAGINA, ONEPAGE
     setCargandoGuardar(true);
     setErroresBackend({});
 
+    // Simulamos un pequeño retraso para ver el estado de carga (opcional)
     await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Empaquetamos todo en FormData porque estamos enviando archivos
+    const dataToSend = new FormData();
+    dataToSend.append("nombre", formData.nombre);
+    dataToSend.append("especie", formData.especie);
+    dataToSend.append("edad", formData.edad);
+    
+    // Solo enviamos las fotos si el usuario seleccionó un archivo nuevo
+    if (formData.foto instanceof File) {
+      dataToSend.append("foto", formData.foto);
+    }
+    if (formData.foto_para_binario instanceof File) {
+      dataToSend.append("foto_para_binario", formData.foto_para_binario);
+    }
 
     try {
       if (editandoId) {
-        await update(editandoId, formData);
+        await update(editandoId, dataToSend);
         toast.success("Mascota actualizada correctamente");
       } else {
-        await create(formData);
+        await create(dataToSend);
         toast.success("Mascota registrada exitosamente");
       }
 
-      setFormData({ nombre: "", especie: "", edad: "" });
+      // Limpiamos los inputs de texto en el estado
+      setFormData(estadoInicial);
       setEditandoId(null);
+      // Limpiamos visualmente los inputs de tipo archivo en el DOM
+      document.getElementById("form-mascotas").reset(); 
       cargarMascotas();
+
     } catch (error) {
       console.error("Error al guardar:", error);
-
       if (error.response && error.response.data) {
-        setErroresBackend(error.response.data); // Guardamos los errores por campo
+        setErroresBackend(error.response.data);
         toast.error("Por favor, corrige los errores en el formulario");
       } else {
         toast.error("Hubo un error de conexión con el servidor");
@@ -79,6 +111,8 @@ export default function MascotasApp() {
       nombre: mascota.nombre,
       especie: mascota.especie,
       edad: mascota.edad,
+      foto: null, // Evitamos cargar archivos viejos, obligamos a subir nuevos si edita
+      foto_para_binario: null,
     });
     setEditandoId(mascota.id);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -139,6 +173,32 @@ export default function MascotasApp() {
     { name: "Especie", selector: (row) => row.especie, sortable: true },
     { name: "Edad", selector: (row) => row.edad, sortable: true },
     {
+      name: "Foto (Media)",
+      cell: (row) => 
+        row.foto ? (
+          <img 
+            src={row.foto} 
+            alt="Carpeta Media" 
+            width="50" 
+            height="50" 
+            style={{ objectFit: 'cover', borderRadius: '5px' }} 
+          />
+        ) : "N/A"
+    },
+    {
+      name: "Foto (Binario)",
+      cell: (row) => 
+        row.foto_base64_display ? (
+          <img 
+            src={row.foto_base64_display} 
+            alt="Base de Datos" 
+            width="50" 
+            height="50" 
+            style={{ objectFit: 'cover', borderRadius: '5px' }} 
+          />
+        ) : "N/A"
+    },
+    {
       name: "Acciones",
       cell: (row) => (
         <div className="d-flex gap-2">
@@ -177,13 +237,13 @@ export default function MascotasApp() {
               </h5>
             </div>
             <div className="card-body">
-              <form onSubmit={handleSubmit}>
+              {/* Le agregamos el ID para poder hacer el .reset() en el submit */}
+              <form id="form-mascotas" onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">Nombre</label>
                   <input
                     type="text"
                     name="nombre"
-                    // Si hay error en 'nombre', agregamos la clase 'is-invalid'
                     className={`form-control ${erroresBackend.nombre ? "is-invalid" : ""}`}
                     value={formData.nombre}
                     onChange={handleChange}
@@ -194,8 +254,9 @@ export default function MascotasApp() {
                     <div className="invalid-feedback">
                       {erroresBackend.nombre.join(", ")}
                     </div>
-                  )}{" "}
+                  )}
                 </div>
+                
                 <div className="mb-3">
                   <label className="form-label">Especie</label>
                   <input
@@ -214,6 +275,7 @@ export default function MascotasApp() {
                     </div>
                   )}
                 </div>
+
                 <div className="mb-3">
                   <label className="form-label">Edad</label>
                   <input
@@ -229,8 +291,45 @@ export default function MascotasApp() {
                     <div className="invalid-feedback">
                       {erroresBackend.edad.join(", ")}
                     </div>
-                  )}{" "}
+                  )}
                 </div>
+
+                {/* Input para la foto que se guarda en la carpeta media */}
+                <div className="mb-3">
+                  <label className="form-label">Foto (Carpeta Media)</label>
+                  <input
+                    type="file"
+                    name="foto"
+                    accept="image/jpeg"
+                    className={`form-control ${erroresBackend.foto ? "is-invalid" : ""}`}
+                    onChange={handleChange}
+                    disabled={cargandoGuardar}
+                  />
+                  {erroresBackend.foto && (
+                    <div className="invalid-feedback">
+                      {erroresBackend.foto.join(", ")}
+                    </div>
+                  )}
+                </div>
+
+                {/* Input para la foto que se guarda como bytes en la base de datos */}
+                <div className="mb-3">
+                  <label className="form-label">Foto (Base de Datos)</label>
+                  <input
+                    type="file"
+                    name="foto_para_binario"
+                    accept="image/jpeg"
+                    className={`form-control ${erroresBackend.foto_para_binario ? "is-invalid" : ""}`}
+                    onChange={handleChange}
+                    disabled={cargandoGuardar}
+                  />
+                  {erroresBackend.foto_para_binario && (
+                    <div className="invalid-feedback">
+                      {erroresBackend.foto_para_binario.join(", ")}
+                    </div>
+                  )}
+                </div>
+
                 <div className="d-grid gap-2">
                   <button
                     type="submit"
@@ -258,8 +357,9 @@ export default function MascotasApp() {
                       className="btn btn-secondary"
                       onClick={() => {
                         setEditandoId(null);
-                        setFormData({ nombre: "", especie: "", edad: "" });
+                        setFormData(estadoInicial);
                         setErroresBackend({});
+                        document.getElementById("form-mascotas").reset();
                       }}
                       disabled={cargandoGuardar}
                     >
