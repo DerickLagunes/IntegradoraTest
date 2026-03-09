@@ -3,7 +3,7 @@ import axios from "axios"; // Importamos axios puro, no nuestra instancia 'api'
 import toast, { Toaster } from "react-hot-toast";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-export default function Login({ onLoginSuccess }) {
+export default function Login({ onLoginSuccess, onSwitchToRegister }) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -100,6 +100,18 @@ export default function Login({ onLoginSuccess }) {
                     )}
                   </button>
                 </div>
+                <div className="text-center mt-3">
+                  <span className="text-muted">¿No tienes cuenta? </span>
+                  <button 
+                    type="button" 
+                    className="btn btn-link p-0" 
+                    onClick={onSwitchToRegister} // Necesitarás recibir esta prop
+                    disabled={cargando}
+                  >
+                    Regístrate aquí
+                  </button>
+                </div>
+                
               </form>
             </div>
           </div>

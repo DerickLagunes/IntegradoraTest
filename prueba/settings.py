@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'prueba',
     'core',
     'mascotas',
+    'usuarios'
 ]
 
 MIDDLEWARE = [
@@ -164,4 +165,4 @@ SIMPLE_JWT = {
 }
 
 
-AUTH_USER_MODEL = 'nombre_de_tu_app.MiUsuario'
+AUTH_USER_MODEL = 'usuarios.MiUsuario'

@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-
+from usuarios.views import RegistroView
 
 urlpatterns = [
     path('', core.index, name='index'),
@@ -17,6 +17,8 @@ urlpatterns = [
     path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     # Endpoint para refrescar el token (recibe el refresh token, devuelve un nuevo access token)
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    path('api/registro/', RegistroView.as_view(), name='registro'),
 ]
 
 # Esto permite visualizar las imágenes en modo DEBUG (desarrollo)
