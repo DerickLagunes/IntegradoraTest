@@ -4,7 +4,7 @@ import DataTable from "react-data-table-component";
 import "bootstrap/dist/css/bootstrap.min.css";
 import toast, { Toaster } from "react-hot-toast";
 
-export default function MascotasApp() {
+export default function MascotasApp({ onLogout }) {
   const [mascotas, setMascotas] = useState([]);
   
   // Estado inicial centralizado para limpiar fácilmente el formulario
@@ -227,6 +227,16 @@ export default function MascotasApp() {
   return (
     <div className="container mt-5">
       <Toaster position="top-right" reverseOrder={false} />
+
+      <div className="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h2 className="text-primary mb-0">Gestión de Mascotas</h2>
+        <button 
+          onClick={onLogout} 
+          className="btn btn-outline-danger fw-bold"
+        >
+          🚪 Cerrar Sesión
+        </button>
+      </div>
 
       <div className="row">
         <div className="col-md-4 mb-4">
