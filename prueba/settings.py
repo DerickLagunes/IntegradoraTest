@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from decouple import config
+# pip install decouple
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,6 +142,8 @@ CORS_ALLOWED_ORIGINS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR/'media'
 
+
+#pip install djangorestframework_simplejwt
 from datetime import timedelta
 
 REST_FRAMEWORK = {
@@ -153,7 +156,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15), 
+    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=3), 
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  
     'ROTATE_REFRESH_TOKENS': True, 
     'BLACKLIST_AFTER_ROTATION': True,    

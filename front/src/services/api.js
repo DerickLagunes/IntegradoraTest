@@ -5,9 +5,7 @@ import axios from 'axios';
 // ==========================================
 
 // Creamos la instancia apuntando a la raíz de tu servidor
-const api = axios.create({
-    baseURL: 'http://localhost:8000'
-});
+const api = axios.create({baseURL: 'http://localhost:8000'});
 
 // Interceptor de Solicitud (Agrega el token si existe)
 api.interceptors.request.use(
